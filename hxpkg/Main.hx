@@ -130,6 +130,8 @@ class Main
 				hxargs.push(pkg.link);
 				if (pkg.branch != null)
 					hxargs.push(pkg.branch);
+				if (pkg.dir != null)
+					hxargs.push(pkg.dir);
 				failMsg = 'Check the github repository.';
 			}
 
@@ -235,6 +237,8 @@ class Main
 		{
 			pkg.link = args[1];
 			pkg.branch = args[2];
+			if (args.length == 4)
+				pkg.dir = args[3];
 		}
 		else if (args[1] != null)
 		{
@@ -388,6 +392,8 @@ class Main
 					pkgmsg += ' ${pkg.link}';
 					if (pkg.branch != null)
 						pkgmsg += ' ${pkg.branch}';
+					if (pkg.dir != null)
+						pkgmsg += ' ${pkg.dir}';
 				}
 
 				msg += '$pkgmsg\n';

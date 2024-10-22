@@ -11,4 +11,5 @@ typedef PKG =
 	@:optional var version:String;
 	@:optional var link:String;
 	@:optional var branch:String; // Or hash, doesn't matter
+	@:optional var dir:String;
 }
