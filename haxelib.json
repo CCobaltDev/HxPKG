@@ -10,7 +10,7 @@
 	"description": "Local haxelib package installer",
 	"version": "1.5.0",
 	"classPath": "hxpkg",
-	"releasenote": "Beautify by default, remove --beautify, change hxpkg update to hxpkg upgrade, add hxpkg setup, and bugfixes",
+	"releasenote": "Beautify by default, remove --beautify, change hxpkg update to hxpkg upgrade, add hxpkg setup, and bugfixes (progress bar might be broken)",
 	"contributors": [
 		"CobaltBar"
 	],
