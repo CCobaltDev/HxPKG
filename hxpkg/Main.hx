@@ -105,9 +105,9 @@ class Main
 			if (!quiet)
 				Sys.print('Installing package ${pkg.name}... \033[K\033[s');
 
-			Sys.println('\033[u\n[' + ''.rpad('=', Std.int((i + 1) / pkgs.length * 40)).rpad('-', 40) + ']');
+			Sys.print('${quiet ? '\033[u' : ''}\n[' + ''.rpad('=', Std.int((i + 1) / pkgs.length * 40)).rpad('-', 40) + ']');
 
-			var hxargs = ['--always', '--quiet'];
+			var hxargs = [pkg.link != null ? '--always' : '--never', '--quiet'];
 			if (!dontSkipDependencies.contains(pkg.name))
 				hxargs.insert(1, '--skip-dependencies');
 
@@ -138,21 +138,21 @@ class Main
 			if (Util.process('haxelib', hxargs) != 0)
 			{
 				if (!quiet)
-					Sys.println('\033[2A\033[ufailed. $failMsg');
+					Sys.println('\033[ufailed. $failMsg');
 				failedPackages.push(pkg.name);
 			}
 			else if (!quiet)
-				Sys.println('\033[2A\033[udone.');
+				Sys.println('\033[udone.');
 		}
 
 		if (failedPackages.length > 0)
 		{
 			if (quiet)
-				Sys.println('\033[2A\033[ufailed.');
+				Sys.println('\033[ufailed.');
 			Sys.println('\033[KFailed to install ${[for (pkg in failedPackages) pkg].join(', ')}.');
 		}
 		else if (quiet)
-			Sys.println('\033[2A\033[udone.');
+			Sys.println('\033[udone.');
 
 		// git HXCPP auto setup
 		if ([

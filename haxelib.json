@@ -8,9 +8,9 @@
 		"installation"
 	],
 	"description": "Local haxelib package installer",
-	"version": "1.5.0",
+	"version": "1.5.1",
 	"classPath": "hxpkg",
-	"releasenote": "Beautify by default, remove --beautify, change hxpkg update to hxpkg upgrade, add hxpkg setup, and bugfixes (progress bar might be broken)",
+	"releasenote": "Fix progress bar (mostly), use --never except on git",
 	"contributors": [
 		"CobaltBar"
 	],
