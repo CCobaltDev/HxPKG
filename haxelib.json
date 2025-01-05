@@ -1,6 +1,6 @@
 {
 	"name": "hxpkg",
-	"url": "https://github.com/CobaltBar/HxPKG/",
+	"url": "https://github.com/CCobaltDev/HxPKG/",
 	"license": "MIT",
 	"tags": [
 		"tools",
@@ -12,7 +12,7 @@
 	"classPath": "hxpkg",
 	"releasenote": "Fix progress bar (mostly), use --never except on git",
 	"contributors": [
-		"CobaltBar"
+		"CCobaltDev"
 	],
 	"main": "hxpkg.Main"
 }
