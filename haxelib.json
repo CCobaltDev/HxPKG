@@ -8,9 +8,9 @@
 		"installation"
 	],
 	"description": "Local haxelib package installer",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"classPath": "hxpkg",
-	"releasenote": "Fix progress bar (mostly), use --never except on git",
+	"releasenote": "Remove the progress bar",
 	"contributors": [
 		"CCobaltDev"
 	],

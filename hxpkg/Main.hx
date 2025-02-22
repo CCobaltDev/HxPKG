@@ -96,16 +96,14 @@ class Main
 		var dontSkipDependencies:Array<String> = ['grig.audio', 'hxCodec'];
 
 		if (quiet)
-			Sys.print('Installing package${pkgs.length > 1 ? 's' : ''} ${[for (pkg in pkgs) pkg.name].join(', ')}... \033[s');
+			Sys.print('Installing package${pkgs.length > 1 ? 's' : ''} ${[for (pkg in pkgs) pkg.name].join(', ')}... ');
 
 		var failedPackages:Array<String> = [];
 
 		for (i => pkg in pkgs)
 		{
 			if (!quiet)
-				Sys.print('Installing package ${pkg.name}... \033[K\033[s');
-
-			Sys.print('${quiet ? '\033[u' : ''}\n[' + ''.rpad('=', Std.int((i + 1) / pkgs.length * 40)).rpad('-', 40) + ']');
+				Sys.print('Installing package ${pkg.name}... ');
 
 			var hxargs = [pkg.link != null ? '--always' : '--never', '--quiet'];
 			if (!dontSkipDependencies.contains(pkg.name))
@@ -138,21 +136,21 @@ class Main
 			if (Util.process('haxelib', hxargs) != 0)
 			{
 				if (!quiet)
-					Sys.println('\033[ufailed. $failMsg');
+					Sys.println('failed. $failMsg');
 				failedPackages.push(pkg.name);
 			}
 			else if (!quiet)
-				Sys.println('\033[udone.');
+				Sys.println('done.');
 		}
 
 		if (failedPackages.length > 0)
 		{
 			if (quiet)
-				Sys.println('\033[ufailed.');
-			Sys.println('\033[KFailed to install ${[for (pkg in failedPackages) pkg].join(', ')}.');
+				Sys.println('failed.');
+			Sys.println('Failed to install ${[for (pkg in failedPackages) pkg].join(', ')}.');
 		}
 		else if (quiet)
-			Sys.println('\033[udone.');
+			Sys.println('done.');
 
 		// git HXCPP auto setup
 		if ([
@@ -160,7 +158,7 @@ class Main
 				if (pkg.name == 'hxcpp' && pkg.link != null && !failedPackages.contains('hxcpp')) pkg
 		].length > 0)
 		{
-			Sys.print('\033[KSetting up hxcpp... ');
+			Sys.print('Setting up hxcpp... ');
 			var curCwd = Sys.getCwd();
 			var pathProc = new Process('haxelib', ['libpath', 'hxcpp']);
 			pathProc.exitCode();
@@ -180,7 +178,7 @@ class Main
 				if (pkg.name == 'hxCodec' && pkg.link != null && !failedPackages.contains('hxCodec')) pkg
 		].length > 0)
 		{
-			Sys.print('\033[KSetting up hxCodec... ');
+			Sys.print('Setting up hxCodec... ');
 			var pathProc = new Process('haxelib', ['libpath', 'hxCodec']);
 			pathProc.exitCode();
 			var path = pathProc.stdout.readAll().toString().trim();
