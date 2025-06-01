@@ -8,9 +8,9 @@
 		"installation"
 	],
 	"description": "Local haxelib package installer",
-	"version": "1.5.2",
+	"version": "1.6.0",
 	"classPath": "hxpkg",
-	"releasenote": "Remove the progress bar",
+	"releasenote": "Added lock command",
 	"contributors": [
 		"CCobaltDev"
 	],

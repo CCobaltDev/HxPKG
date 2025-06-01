@@ -3,6 +3,7 @@ package hxpkg;
 import haxe.ds.ArraySort;
 import haxe.io.Path;
 import hxpkg.PKGFile;
+import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
 
@@ -53,6 +54,8 @@ class Main
 				uninstall(args, flags.contains('--force'), flags.contains('--remove-all'));
 			case 'list':
 				list();
+			case 'lock':
+				lock(args);
 			case 'upgrade':
 				Util.savePKGFile(Util.parsePKGFile());
 				Sys.println('.hxpkg updated');
@@ -404,6 +407,76 @@ class Main
 			Sys.println(msg);
 	}
 
+	static function lock(args:Array<String>):Void
+	{
+		Util.checkPKGFile(true);
+		var pkgFile = Util.parsePKGFile();
+
+		var profile:String = 'default';
+		if (args.indexOf('profile') != -1)
+		{
+			if (args.indexOf('profile') + 1 >= args.length)
+			{
+				Sys.println('No profile specified, aborting');
+				Sys.exit(1);
+			}
+
+			profile = args[args.indexOf('profile') + 1].trim();
+			if (pkgFile[profile] == null)
+				pkgFile.set(profile, []);
+			args = args.splice(0, args.indexOf('profile'));
+		}
+
+		var hxlibProc = new Process('haxelib config');
+		hxlibProc.exitCode();
+		var haxelibPath = hxlibProc.stdout.readAll().toString().trim();
+		hxlibProc.close();
+
+		for (pkg in pkgFile[profile])
+		{
+			if (pkg.link != null)
+			{
+				// Shamelessly stolen from HMM
+				if (!FileSystem.exists(Path.join([haxelibPath, pkg.name, 'git', '.git'])))
+				{
+					Sys.println('Package ${pkg.name} not installed - can\'t lock');
+					continue;
+				}
+
+				var gitProc = new Process('git', ['-C', Path.join([haxelibPath, pkg.name, 'git']), 'rev-parse', 'HEAD']);
+				var fail = gitProc.exitCode() != 0;
+				var hash = gitProc.stdout.readAll().toString().trim();
+				gitProc.close();
+
+				if (fail)
+				{
+					Sys.println('Failed to get git hash of ${pkg.name}');
+					continue;
+				}
+
+				pkg.branch = hash;
+			}
+			else
+			{
+				var proc = new Process('haxelib', ['info', pkg.name]);
+				var fail = proc.exitCode() != 0;
+				var ver = proc.stdout.readAll().toString().trim();
+				proc.close();
+
+				if (fail)
+				{
+					Sys.println('Failed to check ${pkg.name}');
+					continue;
+				}
+
+				pkg.version = ver.substr(ver.indexOf("Version") + 9).split('\n')[0].trim();
+			}
+		}
+
+		Sys.println('Locked package versions');
+		Util.savePKGFile(pkgFile);
+	}
+
 	/*
 		Based on:
 		https://github.com/openfl/hxp/blob/master/src/hxp/System.hx#L1505
@@ -458,6 +531,7 @@ hxpkg clear - Removes all packages from the .hxpkg file
 hxpkg uninstall - Removes all packages installed by the .hxpkg file
 	Does not remove dependencies
 hxpkg list - Lists all packages in the .hxpkg file
+hxpkg lock - Locks all package versions in the .hxpkg file
 hxpkg upgrade - Updates the .hxpkg file to the new format
 	Also happens when attempting to add a package profile in the old format
 hxpkg compact - Compacts the .hxpkg file
