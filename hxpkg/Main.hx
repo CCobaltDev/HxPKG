@@ -434,6 +434,7 @@ class Main
 
 		for (pkg in pkgFile[profile])
 		{
+			Sys.println('Locking ${pkg.name}');
 			if (pkg.link != null)
 			{
 				// Shamelessly stolen from HMM
@@ -458,10 +459,29 @@ class Main
 			}
 			else
 			{
-				var proc = new Process('haxelib', ['info', pkg.name]);
-				var fail = proc.exitCode() != 0;
-				var ver = proc.stdout.readAll().toString().trim();
-				proc.close();
+				// hacky workaround because Process is buggy
+				var proc = new Process('haxelib info ${pkg.name}');
+				var procOut = "";
+				var fail = false;
+				while (true)
+				{
+					var read = proc.stdout.readAll().toString().trim();
+					if (read != null && read != "")
+					{
+						proc.close();
+						if (read.contains("Failed"))
+						{
+							fail = true;
+							break;
+						}
+
+						procOut = read;
+						break;
+					}
+					Sys.sleep(0.1);
+				}
+
+				var ver = procOut;
 
 				if (fail)
 				{
