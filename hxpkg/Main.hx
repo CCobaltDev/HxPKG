@@ -113,7 +113,7 @@ class Main
 				if (!quiet)
 					Sys.print('Checking current version of ${pkg.name}... ');
 
-				var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name);
+				var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name, global);
 				if (haxelibVersion != null && haxelibVersion != 'git')
 				{
 					if (haxelibVersion == pkg.version)
@@ -558,6 +558,7 @@ Flags:
 
 install:
 	--global: Installs packages globally
+	--update: Installs packages only if different
 uninstall:
 	--remove-all: Removes the local repo");
 	}

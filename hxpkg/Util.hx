@@ -110,9 +110,9 @@ class Util
 		return [args, flags];
 	}
 
-	static function getHaxelibVersion(libraryName:String):Null<String>
+	static function getHaxelibVersion(libraryName:String, ?global:Bool = false):Null<String>
 	{
-		var hxlibProc:Process = new Process('haxelib config');
+		var hxlibProc:Process = new Process('haxelib config', global ? ['--global'] : []);
 		hxlibProc.exitCode();
 		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
 		hxlibProc.close();
@@ -142,9 +142,9 @@ class Util
 		return versionFileContent;
 	}
 
-	static function getGitHashForHaxelib(libraryName:String):Null<String>
+	static function getGitHashForHaxelib(libraryName:String, ?global:Bool = false):Null<String>
 	{
-		var hxlibProc:Process = new Process('haxelib config');
+		var hxlibProc:Process = new Process('haxelib config', global ? ['--global'] : []);
 		hxlibProc.exitCode();
 		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
 		hxlibProc.close();
