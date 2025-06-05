@@ -2,6 +2,7 @@ package hxpkg;
 
 import haxe.Http;
 import haxe.Json;
+import haxe.io.Path;
 import hxpkg.PKGFile;
 import sys.FileSystem;
 import sys.io.File;
@@ -107,5 +108,63 @@ class Util
 		}
 
 		return [args, flags];
+	}
+
+	static function getHaxelibVersion(libraryName:String):Null<String>
+	{
+		var hxlibProc:Process = new Process('haxelib config');
+		hxlibProc.exitCode();
+		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
+		hxlibProc.close();
+
+		var libraryPath:String = Path.join([haxelibPath, libraryName]);
+		if (!FileSystem.exists(libraryPath))
+			return null;
+
+		var currentVersionFile:String = Path.join([libraryPath, '.current']);
+		if (!FileSystem.exists(currentVersionFile))
+			return null;
+
+		var versionFileContent:Null<String> = null;
+
+		try
+		{
+			versionFileContent = File.getContent(currentVersionFile);
+		}
+		catch (e)
+		{
+			versionFileContent = null;
+		}
+
+		if (versionFileContent != null)
+			versionFileContent = versionFileContent.trim();
+
+		return versionFileContent;
+	}
+
+	static function getGitHashForHaxelib(libraryName:String):Null<String>
+	{
+		var hxlibProc:Process = new Process('haxelib config');
+		hxlibProc.exitCode();
+		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
+		hxlibProc.close();
+
+		var libraryPath:String = Path.join([haxelibPath, libraryName]);
+		if (!FileSystem.exists(libraryPath))
+			return null;
+
+		var gitPath:String = Path.join([libraryPath, 'git']);
+		if (!FileSystem.exists(gitPath))
+			return null;
+
+		var gitProc:Process = new Process('git', ['-C', gitPath, 'rev-parse', 'HEAD']);
+		var fail:Bool = gitProc.exitCode() != 0;
+		var hash:String = gitProc.stdout.readAll().toString().trim();
+		gitProc.close();
+
+		if (fail)
+			return null;
+
+		return hash;
 	}
 }
