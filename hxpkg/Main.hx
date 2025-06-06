@@ -12,7 +12,10 @@ using StringTools;
 class Main
 {
 	// A bit overkill but i'm too lazy to rework it
-	static final validFlags:Map<String, Array<String>> = ['install' => ['--global', '--force'], 'uninstall' => ['--remove-all']];
+	static final validFlags:Map<String, Array<String>> = [
+		'install' => ['--global', '--force', '--update'],
+		'uninstall' => ['--remove-all']
+	];
 
 	// https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
 	static final urlMatch = new EReg('https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)', 'i');
@@ -43,7 +46,7 @@ class Main
 		switch (cmd)
 		{
 			case 'install':
-				install(args, flags.contains('--global'), flags.contains('--force'));
+				install(args, flags.contains('--global'), flags.contains('--force'), flags.contains('--update'));
 			case 'add':
 				add(args);
 			case 'remove':
@@ -71,12 +74,12 @@ class Main
 		}
 	}
 
-	static function install(args:Array<String>, global:Bool, force:Bool):Void
+	static function install(args:Array<String>, global:Bool, force:Bool, update:Bool):Void
 	{
 		Util.checkPKGFile(true);
 		var pkgFile = Util.parsePKGFile();
 
-		if (!global)
+		if (!global && !update)
 			if (Util.checkLocalHaxelib())
 			{
 				if (!force)
@@ -105,6 +108,40 @@ class Main
 
 		for (i => pkg in pkgs)
 		{
+			if (update)
+			{
+				if (!quiet)
+					Sys.print('Checking current version of ${pkg.name}... ');
+
+				var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name, global);
+				if (haxelibVersion != null)
+				{
+					if (haxelibVersion != 'git')
+					{
+						if (haxelibVersion == pkg.version)
+						{
+							if (!quiet)
+								Sys.println('done. Can be skipped.');
+
+							continue;
+						}
+					}
+					else
+					{
+						var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name, global);
+						if (hash != null && hash == pkg.branch)
+						{
+							if (!quiet)
+								Sys.println('done. Can be skipped.');
+
+							continue;
+						}
+					}
+				}
+
+				if (!quiet)
+					Sys.println('done.');
+			}
 			if (!quiet)
 				Sys.print('Installing package ${pkg.name}... ');
 
@@ -427,69 +464,32 @@ class Main
 			args = args.splice(0, args.indexOf('profile'));
 		}
 
-		var hxlibProc = new Process('haxelib config');
-		hxlibProc.exitCode();
-		var haxelibPath = hxlibProc.stdout.readAll().toString().trim();
-		hxlibProc.close();
-
 		for (pkg in pkgFile[profile])
 		{
 			Sys.println('Locking ${pkg.name}');
-			if (pkg.link != null)
+
+			var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name);
+			if(haxelibVersion != null)
 			{
-				// Shamelessly stolen from HMM
-				if (!FileSystem.exists(Path.join([haxelibPath, pkg.name, 'git', '.git'])))
+				if (haxelibVersion != 'git')
 				{
-					Sys.println('Package ${pkg.name} not installed - can\'t lock');
-					continue;
+					pkg.version = haxelibVersion;
 				}
-
-				var gitProc = new Process('git', ['-C', Path.join([haxelibPath, pkg.name, 'git']), 'rev-parse', 'HEAD']);
-				var fail = gitProc.exitCode() != 0;
-				var hash = gitProc.stdout.readAll().toString().trim();
-				gitProc.close();
-
-				if (fail)
+				else
 				{
-					Sys.println('Failed to get git hash of ${pkg.name}');
-					continue;
-				}
+					var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name);
+					if (hash == null)
+					{
+						Sys.println('Failed to get git hash of ${pkg.name}');
+						continue;
+					}
 
-				pkg.branch = hash;
+					pkg.branch = hash;
+				}
 			}
 			else
 			{
-				// hacky workaround because Process is buggy
-				var proc = new Process('haxelib info ${pkg.name}');
-				var procOut = "";
-				var fail = false;
-				while (true)
-				{
-					var read = proc.stdout.readAll().toString().trim();
-					if (read != null && read != "")
-					{
-						proc.close();
-						if (read.contains("Failed"))
-						{
-							fail = true;
-							break;
-						}
-
-						procOut = read;
-						break;
-					}
-					Sys.sleep(0.1);
-				}
-
-				var ver = procOut;
-
-				if (fail)
-				{
-					Sys.println('Failed to check ${pkg.name}');
-					continue;
-				}
-
-				pkg.version = ver.substr(ver.indexOf("Version") + 9).split('\n')[0].trim();
+				Sys.println('Package ${pkg.name} not installed - can\'t lock');
 			}
 		}
 
@@ -564,6 +564,7 @@ Flags:
 
 install:
 	--global: Installs packages globally
+	--update: Installs packages only if different
 uninstall:
 	--remove-all: Removes the local repo");
 	}
