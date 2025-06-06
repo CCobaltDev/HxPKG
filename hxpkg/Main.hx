@@ -114,25 +114,28 @@ class Main
 					Sys.print('Checking current version of ${pkg.name}... ');
 
 				var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name, global);
-				if (haxelibVersion != null && haxelibVersion != 'git')
+				if (haxelibVersion != null)
 				{
-					if (haxelibVersion == pkg.version)
+					if (haxelibVersion != 'git')
 					{
-						if (!quiet)
-							Sys.println('done. Can be skipped.');
+						if (haxelibVersion == pkg.version)
+						{
+							if (!quiet)
+								Sys.println('done. Can be skipped.');
 
-						continue;
+							continue;
+						}
 					}
-				}
-				else if (haxelibVersion != null)
-				{
-					var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name, global);
-					if (hash != null && hash == pkg.branch)
+					else
 					{
-						if (!quiet)
-							Sys.println('done. Can be skipped.');
+						var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name, global);
+						if (hash != null && hash == pkg.branch)
+						{
+							if (!quiet)
+								Sys.println('done. Can be skipped.');
 
-						continue;
+							continue;
+						}
 					}
 				}
 
@@ -466,20 +469,23 @@ class Main
 			Sys.println('Locking ${pkg.name}');
 
 			var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name);
-			if (haxelibVersion != null && haxelibVersion != 'git')
+			if(haxelibVersion != null)
 			{
-				pkg.version = haxelibVersion;
-			}
-			else if (haxelibVersion != null)
-			{
-				var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name);
-				if (hash == null)
+				if (haxelibVersion != 'git')
 				{
-					Sys.println('Failed to get git hash of ${pkg.name}');
-					continue;
+					pkg.version = haxelibVersion;
 				}
+				else
+				{
+					var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name);
+					if (hash == null)
+					{
+						Sys.println('Failed to get git hash of ${pkg.name}');
+						continue;
+					}
 
-				pkg.branch = hash;
+					pkg.branch = hash;
+				}
 			}
 			else
 			{
