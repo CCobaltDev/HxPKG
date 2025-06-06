@@ -112,7 +112,12 @@ class Util
 
 	static function getHaxelibVersion(libraryName:String, ?global:Bool = false):Null<String>
 	{
-		var hxlibProc:Process = new Process('haxelib config', global ? ['--global'] : []);
+		var configArgs:Array<String> = ['config'];
+
+		if (global)
+			configArgs.insert(0, '--global');
+
+		var hxlibProc:Process = new Process('haxelib', configArgs);
 		hxlibProc.exitCode();
 		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
 		hxlibProc.close();
@@ -144,7 +149,12 @@ class Util
 
 	static function getGitHashForHaxelib(libraryName:String, ?global:Bool = false):Null<String>
 	{
-		var hxlibProc:Process = new Process('haxelib config', global ? ['--global'] : []);
+		var configArgs:Array<String> = ['config'];
+
+		if (global)
+			configArgs.insert(0, '--global');
+
+		var hxlibProc:Process = new Process('haxelib', configArgs);
 		hxlibProc.exitCode();
 		var haxelibPath:String = hxlibProc.stdout.readAll().toString().trim();
 		hxlibProc.close();

@@ -126,7 +126,7 @@ class Main
 				}
 				else if (haxelibVersion != null)
 				{
-					var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name);
+					var hash:Null<String> = Util.getGitHashForHaxelib(pkg.name, global);
 					if (hash != null && hash == pkg.branch)
 					{
 						if (!quiet)
