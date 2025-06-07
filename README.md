@@ -38,5 +38,6 @@ Inspired by [hmm](https://github.com/andywhite37/hmm)
 
 - `install`:
   - `--global`: Installs packages globally
+  - `--update`: Updates installed packages to the latest version
 - `uninstall`:
   - `--remove-all`: Removes the local repo
