@@ -8,9 +8,9 @@
 		"installation"
 	],
 	"description": "Local haxelib package installer",
-	"version": "1.6.1",
+	"version": "1.6.2",
 	"classPath": "hxpkg",
-	"releasenote": "Fixed lock command",
+	"releasenote": "Install --update argument",
 	"contributors": [
 		"CCobaltDev"
 	],

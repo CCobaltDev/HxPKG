@@ -469,7 +469,7 @@ class Main
 			Sys.println('Locking ${pkg.name}');
 
 			var haxelibVersion:Null<String> = Util.getHaxelibVersion(pkg.name);
-			if(haxelibVersion != null)
+			if (haxelibVersion != null)
 			{
 				if (haxelibVersion != 'git')
 				{
