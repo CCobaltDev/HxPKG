@@ -564,7 +564,7 @@ Flags:
 
 install:
 	--global: Installs packages globally
-	--update: Installs packages only if different
+	--update: Updates installed packages to the latest version
 uninstall:
 	--remove-all: Removes the local repo");
 	}
